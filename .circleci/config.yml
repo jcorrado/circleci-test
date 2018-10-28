@@ -34,8 +34,8 @@ jobs:
       - run:
           name: Extract Container Addresses
           command: |
-            IP_ADDR=$(ip a l dev $CT_PRIMARY_NET_IFACE | perl -ne '/inet\s+((?:\d+\.){3}\d+)/ && print "$1\n"')
-            MAC_ADDR=$(ip a l dev $CT_PRIMARY_NET_IFACE | perl -ne 'm!link/ether\s+((?:[a-f\d]{2}:){5}[a-f\d]{2})!i && print "$1\n"')
+            IP_ADDR=$( ip a l dev $CT_PRIMARY_NET_IFACE | perl -ne 'm!inet\s+((?:\d+\.){3}\d+)/! && print "$1"')
+            MAC_ADDR=$(ip a l dev $CT_PRIMARY_NET_IFACE | perl -ne 'm!link/ether\s+((?:[a-f\d]{2}:){5}[a-f\d]{2})!i && print "$1"')
             echo IP_ADDR=$IP_ADDR | tee -a $BASH_ENV
             echo MAC_ADDR=$MAC_ADDR | tee -a $BASH_ENV
       - run:

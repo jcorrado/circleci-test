@@ -51,7 +51,7 @@ jobs:
             cp logstash.conf.test /etc/logstash/conf.d/logstash.conf
             /usr/share/logstash/bin/logstash --path.settings=/etc/logstash > logstash.log 2>&1 &
             tcpreplay -i $CT_PRIMARY_NET_IFACE --pps 100 test.pcap
-      - store_artifacts:
-          path logstash.log
-      - store_artifacts:
-          path logstash.out.json
+      # - store_artifacts:
+      #     path logstash.log
+      # - store_artifacts:
+      #     path logstash.out.json

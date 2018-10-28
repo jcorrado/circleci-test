@@ -1,16 +1,29 @@
 version: 2.0
 jobs:
- build:
+ setup:
    docker:
      - image: debian:stretch
    steps:
-     - checkout
      - run:
-         name: Identify Container
+         name: Install Packages
          command: |
-           hostname -f
-           ip a l
-           cat /etc/os-release
+           sudo apt-get -y -qq update
+           sudo apt-get -y install default-jre apt-transport-https
+           curl https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+           echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
+           sudo apt-get -y -qq update
+           sudo apt-get install logstash=1:6.4.0-1
      - run:
-         name: Show Code
-         command: ls -al --color
+         name: Verify
+         command: dpkg -l logstash
+     
+     # - checkout
+     # - run:
+     #     name: Identify Container
+     #     command: |
+     #       hostname -f
+     #       ip a l
+     #       cat /etc/os-release
+     # - run:
+     #     name: Show Code
+     #     command: ls -al --color

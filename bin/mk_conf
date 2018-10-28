@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'erb'
+
+options = {}
+OptionParser.new do |opts|
+  opts.on("-k", "--access-key-id KEY", "AWS Access Key ID") do |o|
+    options[:access_key_id] = o
+  end
+
+  opts.on("-s", "--secret-access-key KEY", "AWS Secret Access Key") do |o|
+    options[:secret_access_key] = o
+  end
+
+  opts.on("-e", "--elasticsearch FQDN:PORT", "Elasticsearch Address and Port") do |o|
+    options[:elasticsearch] = o
+  end
+
+  opts.on("-t", "--template FILE", "ERB Template for logstash.conf") do |o|
+    options[:template] = o
+  end
+end.parse!
+
+errs = []
+[:access_key_id, :secret_access_key, :elasticsearch, :template].each do |arg|
+  if options[arg].nil?
+    errs << "please supply --" + arg.to_s.gsub(/_/, "-")
+  end
+end
+
+if errs.length > 0
+  puts errs
+  exit 1
+end
+
+access_key_id = options[:access_key_id]
+secret_access_key = options[:secret_access_key]
+elasticsearch = options[:elasticsearch]
+
+template = File.read(options[:template])
+print ERB.new(template).result(binding)

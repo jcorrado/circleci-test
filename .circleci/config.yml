@@ -44,4 +44,4 @@ jobs:
           name: Rewrite Test Capture For This Container
           command: |
             tcprewrite --fixcsum -i test/caps/latest.pcap -o test.pcap --dstipmap=${PROD_LOGSTASH_ADDR}/32:$IP_ADDR/32 --enet-dmac=$MAC_ADDR
-            tcpdump -enr test.pcap | head -6
+            tcpdump -c 10 -enr test.pcap | grep -P "$MAC_ADDR.+?$IP_ADDR"

@@ -5,25 +5,18 @@ jobs:
       - image: debian:stretch
     steps:
       - run:
-          command: id
-      # - run:
-      #     name: Install Packages
-      #     command: |
-      #       sudo apt-get -y -qq update
-      #       sudo apt-get -y install default-jre apt-transport-https
-      #       curl https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-      #       echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
-      #       sudo apt-get -y -qq update
-      #       sudo apt-get install logstash=1:6.4.0-1
-      # - run:
-      #     name: Verify
-      #     command: dpkg -l logstash
-
-
-
-
-
-    # - checkout
+          name: Install Packages
+          command: |
+            apt-get -y -qq update
+            apt-get -y install default-jre apt-transport-https
+            curl https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
+            echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-6.x.list
+            apt-get -y -qq update
+            apt-get install logstash=1:6.4.0-1
+      - run:
+          name: Verify
+          command: dpkg -l logstash
+     # - checkout
      # - run:
      #     name: Identify Container
      #     command: |

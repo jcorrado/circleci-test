@@ -42,7 +42,7 @@ jobs:
           name: Verify Ct Addrs
           command: |
             echo "IP_ADDR is: $IP_ADDR"
-            echo MAC_ADDR is: $MAC_ADDR"
+            echo "MAC_ADDR is: $MAC_ADDR"
      # - checkout
      # - run:
      #     name: Identify Container

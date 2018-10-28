@@ -15,12 +15,12 @@ jobs:
             curl "$ELASTIC_REPO_KEY" | apt-key add -
             echo "deb $ELASTIC_REPO stable main" | tee -a /etc/apt/sources.list.d/elastic.list
             apt-get -y -qq update
-      - run:
-          name: Install Logstash
-          command: apt-get -y install default-jre logstash=1:6.4.0-1
-      - run:
-          name: Install Testing Tools
-          command: apt-get -y install iproute2 tcpreplay jq
+      # - run:
+      #     name: Install Logstash
+      #     command: apt-get -y install default-jre logstash=1:6.4.0-1
+      # - run:
+      #     name: Install Testing Tools
+      #     command: apt-get -y install iproute2 tcpreplay jq
      # - checkout
      # - run:
      #     name: Identify Container

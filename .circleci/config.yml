@@ -45,3 +45,13 @@ jobs:
           command: |
             tcprewrite --fixcsum -i test/caps/latest.pcap -o test.pcap --dstipmap=${PROD_LOGSTASH_ADDR}/32:$IP_ADDR/32 --enet-dmac=$MAC_ADDR
             tcpdump -c 10 -enr test.pcap | grep -P "$MAC_ADDR.+?$IP_ADDR"
+      - run:
+          name: Replay Capture And Process With Logstash
+          command: |
+            cp logstash.conf.test /etc/logstash/conf.d/logstash.conf
+            /usr/share/logstash/bin/logstash --path.settings=/etc/logstash > logstash.log 2>&1 &
+            tcpreplay -i $CT_PRIMARY_NET_IFACE --pps 100 test.pcap
+      - store_artifacts:
+          path logstash.log
+      - store_artifacts:
+          path logstash.out.json

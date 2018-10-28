@@ -5,51 +5,43 @@ jobs:
       ELASTIC_REPO_KEY: https://artifacts.elastic.co/GPG-KEY-elasticsearch
       ELASTIC_REPO: https://artifacts.elastic.co/packages/6.x/apt
       CT_PRIMARY_NET_IFACE: eth0
+      PROD_LOGSTASH_ADDR: 172.31.15.184
     docker:
       - image: debian:stretch
     steps:
-      # - run:
-      #     name: Install Logstash Repository
-      #     command: |
-      #       apt-get -y -qq update
-      #       apt-get -y install apt-transport-https curl gnupg
-      #       curl "$ELASTIC_REPO_KEY" | apt-key add -
-      #       echo "deb $ELASTIC_REPO stable main" | tee -a /etc/apt/sources.list.d/elastic.list
-      #       apt-get -y -qq update
-      # - run:
-      #     name: Install Java Runtime
-      #     # Elastic Co's Logstash packages do not include run-time deps,
-      #     # so you have to install the JRE manually.  When trying to
-      #     # roll this into one run of apt-get, the logstash pkg install
-      #     # scripts failed, so we split it out here.
-      #     command: |
-      #       apt-get -y install default-jre
-      #       java -version
-      # - run:
-      #     name: Install Logstash
-      #     command: apt-get -y install logstash=1:6.4.0-1
-      # - run:
-      #     name: Install Testing Tools
-      #     command: apt-get -y install iproute2 tcpreplay jq
+      - checkout
       - run:
           name: Extract Container Addresses
           command: |
-            IP_ADDR=$( ip a l dev $CT_PRIMARY_NET_IFACE | perl -ne 'm!inet\s+((?:\d+\.){3}\d+)/! && print "$1"')
+            IP_ADDR=$( ip a l dev $CT_PRIMARY_NET_IFACE | perl -ne 'm!inet\s+((?:\d+\.){3}\d+)! && print "$1"')
             MAC_ADDR=$(ip a l dev $CT_PRIMARY_NET_IFACE | perl -ne 'm!link/ether\s+((?:[a-f\d]{2}:){5}[a-f\d]{2})!i && print "$1"')
             echo IP_ADDR=$IP_ADDR | tee -a $BASH_ENV
             echo MAC_ADDR=$MAC_ADDR | tee -a $BASH_ENV
       - run:
-          name: Verify Ct Addrs
+          name: Install Logstash Repository
           command: |
-            echo "IP_ADDR is: $IP_ADDR"
-            echo "MAC_ADDR is: $MAC_ADDR"
-     # - checkout
-     # - run:
-     #     name: Identify Container
-     #     command: |
-     #       hostname -f
-     #       ip a l
-     #       cat /etc/os-release
-     # - run:
-     #     name: Show Code
-     #     command: ls -al --color
+            apt-get -y -qq update
+            apt-get -y install apt-transport-https curl gnupg
+            curl "$ELASTIC_REPO_KEY" | apt-key add -
+            echo "deb $ELASTIC_REPO stable main" | tee -a /etc/apt/sources.list.d/elastic.list
+            apt-get -y -qq update
+      - run:
+          name: Install Java Runtime
+          # Elastic Co's Logstash packages do not include run-time deps,
+          # so you have to install the JRE manually.  When trying to
+          # roll this into one run of apt-get, the logstash pkg install
+          # scripts failed, so we split it out here.
+          command: |
+            apt-get -y install default-jre
+            java -version
+      - run:
+          name: Install Logstash
+          command: apt-get -y install logstash=1:6.4.0-1
+      - run:
+          name: Install Testing Tools
+          command: apt-get -y install iproute2 tcpdump tcpreplay jq
+      - run:
+          name: Rewrite Test Capture For This Container
+          command: |
+            tcprewrite --fixcsum -i test/caps/latest.pcap -o test.pcap --dstipmap=${PROD_LOGSTASH_ADDR}/32:$IP_ADDR/32 --enet-dmac=$MAC_ADDR
+            tcpdump -enr test.cap | head -6

@@ -53,6 +53,6 @@ jobs:
             /usr/share/logstash/bin/logstash --path.settings=/etc/logstash > logstash.log 2>&1 &
             sudo tcpreplay -i $PRIMARY_NET_IFACE --pps 100 test.pcap
       - store_artifacts:
-          path ./logstash.log
+          path: logstash.log
       - store_artifacts:
-          path ./logstash.out.json
+          path: logstash.json.log

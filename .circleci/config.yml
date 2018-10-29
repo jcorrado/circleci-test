@@ -6,8 +6,9 @@ jobs:
       ELASTIC_REPO: https://artifacts.elastic.co/packages/6.x/apt
       CT_PRIMARY_NET_IFACE: eth0
       PROD_LOGSTASH_ADDR: 172.31.15.184
-    docker:
-      - image: debian:stretch
+    # docker:
+    #   - image: debian:stretch
+    machine: true
     steps:
       - checkout
       - run:

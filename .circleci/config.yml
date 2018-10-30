@@ -32,12 +32,13 @@ jobs:
       - run:
           name: Rewrite Test Capture For Target Logstash Container
           command: |
-            ./bin/wait-for-it.sh --host=$IP_ADDR --port=12201 --timeout=300
             tcprewrite --fixcsum -i test/caps/latest.pcap -o test.pcap --dstipmap=${PROD_LOGSTASH_ADDR}/32:$IP_ADDR/32 --enet-dmac=$MAC_ADDR
             sudo tcpdump -c 10 -enr test.pcap | grep -P "$MAC_ADDR.+?$IP_ADDR"
       - run:
           name: Replay Capture Against Logstash Container
-          command: sudo tcpreplay -i docker0 --pps 100 test.pcap
+          command: |
+            ./bin/wait-for-it.sh --host=$IP_ADDR --port=9600 --timeout=300
+            sudo tcpreplay -i docker0 --pps 100 test.pcap
       - run:
           name: Shutdown Logstash Container
           command: docker stop logstash

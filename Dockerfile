@@ -19,6 +19,6 @@ RUN apt-get -y install default-jre
 RUN java -version
 RUN apt-get -y install logstash=1:6.4.0-1
 
+EXPOSE 5514
 EXPOSE 12201
-EXPOSE 9600
 ENTRYPOINT ["/usr/share/logstash/bin/logstash", "--path.settings=/etc/logstash"]

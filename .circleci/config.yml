@@ -38,6 +38,9 @@ jobs:
           name: Replay Capture Against Logstash Container
           command: sudo tcpreplay -i docker0 --pps 100 test.pcap
       - run:
+          name: Shutdown Logstash Container
+          command: docker stop logstash
+      - run:
           name: Save Logstash Daemon Log'
           command: docker logs logstash > artifacts/logstash_daemon.log
       - store_artifacts:

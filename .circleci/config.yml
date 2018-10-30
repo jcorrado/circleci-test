@@ -28,7 +28,7 @@ jobs:
           name: Install Testing Tools
           command: |
             sudo apt-get -y -qq update
-            sudo apt-get -y install tcpdump tcpreplay jq
+            sudo apt-get -y install tcpdump tcpreplay jq realpath
       - run:
           name: Rewrite Test Capture For Target Logstash Container
           command: |

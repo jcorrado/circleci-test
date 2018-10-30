@@ -37,7 +37,7 @@ jobs:
       - run:
           name: Replay Capture Against Logstash Container
           command: |
-            ./bin/wait-for-it.sh --host=$IP_ADDR --port=9600 --timeout=300
+            ./bin/wait-for-it.sh --host=$IP_ADDR --port=5514 --timeout=300
             sudo tcpreplay -i docker0 --pps 100 test.pcap
       - run:
           name: Shutdown Logstash Container

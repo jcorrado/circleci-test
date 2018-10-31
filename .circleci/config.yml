@@ -11,7 +11,7 @@ jobs:
           name: Retrieve And Launch Logstash Test Container
           command: |
             mkdir artifacts
-            $(aws ecr get-login --region us-east-1)
+            $(aws ecr get-login --no-include-email --region us-east-1)
             docker run -d --name=logstash \
             -v $(pwd)/conf:/etc/logstash/conf.d \
             -v $(pwd)/artifacts:/artifacts \

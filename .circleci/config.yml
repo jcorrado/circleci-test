@@ -33,6 +33,7 @@ jobs:
           command: |
             sudo apt-get -y -qq update
             sudo apt-get -y install tcpdump tcpreplay realpath
+            sudo gem install --no-rdoc --no-ri rspec json_spec
             
       - run:
           name: Rewrite Test Capture For Target Logstash Container

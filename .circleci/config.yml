@@ -52,7 +52,13 @@ jobs:
             sudo tcpreplay -i docker0 --pps 100 test.pcap
       - run: docker stop logstash
           
-      - run: rspec
+      - run:
+          name: Run Tests
+          command: |
+            # Logstash outputs a sereis of JSON objects but Rspec's
+            # validator wants a single JSON document
+            perl -i -0pe 's! \}\s*\n\s*\{ ! },\n{ !xsg' artifacts/test_output.json
+            rspec
           
       - run:
           name: Save Logstash Daemon Log'

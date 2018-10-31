@@ -2,21 +2,20 @@ version: 2.0
 jobs:
   build:
     environment:
+      LOGSTASH_CT: 307937454286.dkr.ecr.us-east-1.amazonaws.com/empatico/logstash
       PROD_LOGSTASH_ADDR: 172.31.15.184
     machine: true
     steps:
       - checkout
       - run:
-          name: Build Logstash Test Container
-          command: docker build -t logstash .
-      - run:
-          name: Launch Logstash Test Container
+          name: Retrieve And Launch Logstash Test Container
           command: |
             mkdir artifacts
+            $(aws ecr get-login --region us-east-1)
             docker run -d --name=logstash \
             -v $(pwd)/conf:/etc/logstash/conf.d \
             -v $(pwd)/artifacts:/artifacts \
-            logstash
+            $LOGSTASH_CT
       - run:
           name: Extract Container Addresses
           command: |

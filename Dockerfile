@@ -1,8 +1,11 @@
 FROM debian:stretch
+
 MAINTAINER Jereme Corrado <jereme@zoio.net>
 
 ENV ELASTIC_REPO_KEY https://artifacts.elastic.co/GPG-KEY-elasticsearch
 ENV ELASTIC_REPO https://artifacts.elastic.co/packages/6.x/apt
+
+ENV DEBIAN_FRONTEND noninteractive
 
 # Setup Elastic Co repo
 RUN apt-get -y -qq update && \
@@ -20,5 +23,6 @@ RUN java -version
 RUN apt-get -y install logstash=1:6.4.0-1
 
 EXPOSE 5514
-EXPOSE 12201
+EXPOSE 12201/udp
+
 ENTRYPOINT ["/usr/share/logstash/bin/logstash", "--path.settings=/etc/logstash"]

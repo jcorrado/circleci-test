@@ -51,7 +51,11 @@ jobs:
             ./bin/wait-for-it.sh --host=$IP_ADDR --port=5514 --timeout=300
             sudo tcpreplay -i docker0 --pps 100 test.pcap
 
-      - run: docker stop logstash
+      - run: 
+          name: Stop Logstash And Save Daemon Logs
+          command: |
+            docker stop logstash
+            docker logs logstash > artifacts/logstash_daemon.log
           
       - run:
           name: Run Tests
@@ -60,10 +64,6 @@ jobs:
             # validator wants a single JSON document
             perl -i -0pe 's! \}\s*\n\s*\{ ! },\n{ !xsg' artifacts/test_output.json
             rspec
-          
-      - run:
-          name: Save Logstash Daemon Log'
-          command: docker logs logstash > artifacts/logstash_daemon.log
           
       - store_artifacts:
           path: artifacts

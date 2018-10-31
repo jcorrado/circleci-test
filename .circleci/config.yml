@@ -19,15 +19,15 @@ jobs:
       - run:
           name: Extract Container Addresses
           command: |
-            IP_ADDR=$( docker inspect logstash | jq -r '.[0].NetworkSettings.Networks.bridge.IPAddress')
-            MAC_ADDR=$(docker inspect logstash | jq -r '.[0].NetworkSettings.Networks.bridge.MacAddress')
+            IP_ADDR=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' logstash)
+            MAC_ADDR=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' logstash)
             echo IP_ADDR=$IP_ADDR | tee -a $BASH_ENV
             echo MAC_ADDR=$MAC_ADDR | tee -a $BASH_ENV
       - run:
           name: Install Testing Tools
           command: |
             sudo apt-get -y -qq update
-            sudo apt-get -y install tcpdump tcpreplay jq realpath
+            sudo apt-get -y install tcpdump tcpreplay realpath
       - run:
           name: Rewrite Test Capture For Target Logstash Container
           command: |
@@ -46,4 +46,4 @@ jobs:
           command: docker logs logstash > artifacts/logstash_daemon.log
       - store_artifacts:
           path: artifacts
-          prefix: logstash
+          destination: logstash

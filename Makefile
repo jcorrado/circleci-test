@@ -12,7 +12,6 @@ docker:
 	docker tag $(IMAGE):$(REV) $(ECR_IMAGE)
 
 # Requires a login:
-# $(aws --profile=empatico ecr get-login --region us-east-1 | perl -pe 's/-e none //')
 .PHONY: release
 release: docker
 	docker push $(ECR_IMAGE):$(REV)

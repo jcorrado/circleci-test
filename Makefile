@@ -11,7 +11,7 @@ docker:
 	docker tag $(IMAGE):$(REV) $(ECR_IMAGE):$(REV)
 	docker tag $(IMAGE):$(REV) $(ECR_IMAGE)
 
-# Requires a login:
+# Requires a login
 .PHONY: release
 release: docker
 	docker push $(ECR_IMAGE):$(REV)

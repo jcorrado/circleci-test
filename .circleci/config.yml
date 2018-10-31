@@ -7,15 +7,19 @@ jobs:
     machine: true
     steps:
       - checkout
+
       - run:
           name: Retrieve And Launch Logstash Test Container
           command: |
             mkdir artifacts
+
             $(aws ecr get-login --no-include-email --region us-east-1)
+
             docker run -d --name=logstash \
             -v $(pwd)/conf:/etc/logstash/conf.d \
             -v $(pwd)/artifacts:/artifacts \
             $LOGSTASH_CT
+            
       - run:
           name: Extract Container Addresses
           command: |
@@ -23,27 +27,36 @@ jobs:
             MAC_ADDR=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}' logstash)
             echo IP_ADDR=$IP_ADDR | tee -a $BASH_ENV
             echo MAC_ADDR=$MAC_ADDR | tee -a $BASH_ENV
+            
       - run:
           name: Install Testing Tools
           command: |
             sudo apt-get -y -qq update
             sudo apt-get -y install tcpdump tcpreplay realpath
+            
       - run:
           name: Rewrite Test Capture For Target Logstash Container
           command: |
-            tcprewrite --fixcsum -i test/caps/latest.pcap -o test.pcap --dstipmap=${PROD_LOGSTASH_ADDR}/32:$IP_ADDR/32 --enet-dmac=$MAC_ADDR
-            sudo tcpdump -c 10 -enr test.pcap | grep -P "$MAC_ADDR.+?$IP_ADDR"
+            tcprewrite --fixcsum \
+            --dstipmap=${PROD_LOGSTASH_ADDR}/32:$IP_ADDR/32 \
+            --enet-dmac=$MAC_ADDR \
+            -i spec/fixtures/core_gelf_20181025/orig.pcap \
+            -o test.pcap
+            sudo tcpdump -c 3 -enr test.pcap | grep -P "$MAC_ADDR.+?$IP_ADDR"
+            
       - run:
           name: Replay Capture Against Logstash Container
           command: |
             ./bin/wait-for-it.sh --host=$IP_ADDR --port=5514 --timeout=300
             sudo tcpreplay -i docker0 --pps 100 test.pcap
-      - run:
-          name: Shutdown Logstash Container
-          command: docker stop logstash
+      - run: docker stop logstash
+          
+      - run: rspec
+          
       - run:
           name: Save Logstash Daemon Log'
           command: docker logs logstash > artifacts/logstash_daemon.log
+          
       - store_artifacts:
           path: artifacts
           destination: logstash

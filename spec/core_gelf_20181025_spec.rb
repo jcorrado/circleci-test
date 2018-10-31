@@ -7,6 +7,6 @@ describe "core GELF 201810225" do
   end
 
   it "yielded equivalent JSON output" do
-    @good_json.json.should be_json_eql(@test_output_json)
+    @good_json.should be_json_eql(@test_output_json)
   end
 end
